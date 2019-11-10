@@ -24,23 +24,23 @@ function onRequest(request, response){
     console.log(`Database access with raw of ${request.url}`);
   } else if (request.url.startsWith("/_set?")) {
       var query = request.url.split("?")[1].split("&");
-      var id = q2[0].split("=")[1];
-      var newValue = q2[1].split("=")[1];
+      var id = query[0].split("=")[1];
+      var newValue = query[1].split("=")[1];
 
       if (approvedUsers[id]) {
         var user = approvedUsers[id];
         var data = JSON.parse(fs.readFileSync("data.json"));
-        data[user["building"]][user["room"]] = newValue;
-        fs.writeFileSync("data.json", JSON.stringify(data));
+        data[user["building"]][user["room"]]["data"] = newValue;
+        fs.writeFileSync("data.json", JSON.stringify(data, null, 2));
       }
-  } else{
+  } else {
     //Asset is Javascript or CSS
     console.log(`Loading asset with directory of ${request.url}`);
     if(request.url.endsWith(".css")){
       response.setHeader('Content-Type', 'text/css');
       console.log("CSS");
     } else if(request.url.endsWith(".js")){
-      console.log("JS");
+        console.log("JS");
       response.setHeader('Content-Type', 'application/javascript');
     } else {
       console.log("HTML");
