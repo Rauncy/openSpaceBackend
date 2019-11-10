@@ -31,8 +31,8 @@ function onRequest(request, response){
         var user = approvedUsers[id];
         var data = JSON.parse(fs.readFileSync("data.json"));
         data[user["building"]][user["room"]] = newValue;
+        fs.writeFileSync("data.json", JSON.stringify(data));
       }
-
   } else{
     //Asset is Javascript or CSS
     console.log(`Loading asset with directory of ${request.url}`);
