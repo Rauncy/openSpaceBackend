@@ -1,5 +1,10 @@
 const http = require('http');
 const fs = require('fs');
+const crypto = require('crypto');
+const hash = crypto.createHash('md5');
+
+var approvedUsers = fs.readFileSync("approvedUsers.json");
+approvedUsers = JSON.parse(approvedUsers);
 
 var server;
 var configs = {};
@@ -7,19 +12,30 @@ var configs = {};
 function onRequest(request, response){
   console.log();
   console.log("User made a request for " + request.url);
+  var content = "/site";
   if (request.url.startsWith("/_get/")) {
+    var data = fs.readFileSync("data.json");
+    content = data;
+    response.setHeader('Content-Type', 'text/json');
+    response.write(content);
+    response.end();
+    return;
 
-    //for data
-    //http://site.com/_db?id=dwhdbwabdaw&data=23
-    console.log(`database access with raw of ${request.url}`);
-  } else if (request.url.startsWith("/_set")) {
-      var query = request.url.substring(request.url.indexOf("?"));
-      console.log(`tried to set ${query}`)
+    console.log(`Database access with raw of ${request.url}`);
+  } else if (request.url.startsWith("/_set?")) {
+      var query = request.url.split("?")[1].split("&");
+      var id = q2[0].split("=")[1];
+      var newValue = q2[1].split("=")[1];
+
+      if (approvedUsers[id]) {
+        var user = approvedUsers[id];
+        var data = JSON.parse(fs.readFileSync("data.json"));
+        data[user["building"]][user["room"]] = newValue;
+      }
+
   } else{
-
     //Asset is Javascript or CSS
     console.log(`Loading asset with directory of ${request.url}`);
-    var page = "/site";
     if(request.url.endsWith(".css")){
       response.setHeader('Content-Type', 'text/css');
       console.log("CSS");
@@ -28,32 +44,30 @@ function onRequest(request, response){
       response.setHeader('Content-Type', 'application/javascript');
     } else {
       console.log("HTML");
-      page = loadHTML(request.url, response);
-      response.write(page);
+      content = loadHTML(request.url, response);
+      response.write(content);
       response.end();
       return;
     }
 
     var path = request.url//request.url.substring(7, request.url.length);
     try {
-      page = fs.readFileSync(`./site${path}`, "UTF-8");
+      content = fs.readFileSync(`./site${path}`, "UTF-8");
       response.writeHead(200);
     } catch(err) {
       console.log("Asset Error");
       console.log(`./site${path}`)
-      page = "Asset does not exist";
+      content = "Asset does not exist";
       response.setHeader('Content-Type', 'text/plain');
       response.writeHead(404);
     }
-    //Is HTML page
+    //Is HTML content
   }
-  response.write(page);
+  response.write(content);
   response.end();
 }
 
 function loadHTML(url, res){
-  var page;
-
   res.setHeader('Content-Type', 'text/html');
 
   var path;
