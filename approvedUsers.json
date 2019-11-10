@@ -1,14 +1,17 @@
 {
   "c11cf209bbcb2a8577bc94f238782f21" : {
     "building": "RHSW",
+    "floor": 1,
     "room": "1.008"
   },
   "c1beb01773ad90447c4ad050b8ad55d6" : {
     "building": "RHSW",
+    "floor": 2,
     "room": "2.008"
   },
   "7f5ae6196e927ff44555f42da9fe655b" : {
     "building": "RHSW",
+    "floor": 3,
     "room": "3.008"
   }
 }
